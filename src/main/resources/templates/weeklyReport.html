@@ -2,10 +2,27 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/css/uikit.min.css}" />
+    <script th:src="@{/js/uikit.min.js}"></script>
+    <script th:src="@{/js/uikit-icons.min.js}"></script>
     <title>Title</title>
 </head>
 <body>
     <form method="post" action="post">
+        <!--/* TODO: テーブル生成について考える */-->
+        <table class="uk-table">
+            <caption>勤怠を入力したい日付を選択してください。</caption>
+            <thead>
+            <tr>
+                <th th:each="dayOfWeek : ${dayOfWeekList}">[[${dayOfWeek}]]</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td></td>
+            </tr>
+            </tbody>
+        </table>
         <input type="text" name="test" />
         <input type="submit" value="送信" />
     </form>
