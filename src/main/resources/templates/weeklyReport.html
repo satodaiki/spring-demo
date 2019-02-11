@@ -2,14 +2,57 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <!--/* uikit */-->
     <link rel="stylesheet" th:href="@{/css/uikit.min.css}" />
     <script th:src="@{/js/uikit.min.js}"></script>
     <script th:src="@{/js/uikit-icons.min.js}"></script>
+    <!--/* jQuery */-->
+    <script th:src="@{/js/jquery-3.3.1.min.js}"></script>
+    <script>
+        $("a.calendar-next-month").on("click", function() {
+            $.ajax({
+		        url:"http://httpbin.org/post", // 通信先のURL
+		        type:"POST",		// 使用するHTTPメソッド
+		        data:$("#form1").serialize(), // 送信するデータ
+		        dataType:"json", // 応答のデータの種類 (xml/html/script/json/jsonp/text)
+		        timespan:1000 		// 通信のタイムアウトの設定(ミリ秒)
+		    }).done(function(data1,textStatus,jqXHR) {
+		        // 2. doneは、通信に成功した時に実行される
+		        //  引数のdata1は、通信で取得したデータ
+		        //  引数のtextStatusは、通信結果のステータス
+		        //  引数のjqXHRは、XMLHttpRequestオブジェクト
+			    $("#span1").text(jqXHR.status); //例：200
+			    $("#span2").text(textStatus); //例：success
+
+			    // 3. キーを指定して値を表示
+			    $("#span4").text(data1["form"]["cs1"]);
+
+			    // 4. JavaScriptオブジェクトをJSONに変換
+			    var data2 = JSON.stringify(data1);
+			    console.log(data2); //コンソールにJSONが表示される
+
+			    // 5.JSONをJavaScriptオブジェクトにし、
+			    // キーを指定して値(httpbin.org)を表示
+			    var data3 = JSON.parse(data2);
+			    $("#span5").text(data3["headers"]["Host"]);
+		    }).fail(function(jqXHR, textStatus, errorThrown ) {
+		        // 6. failは、通信に失敗した時に実行される
+		        $("#span1").text(jqXHR.status); //例：404
+			    $("#span2").text(textStatus); //例：error
+			    $("#span3").text(errorThrown); //例：NOT FOUND
+		    }).always(function(){
+		        // 7. alwaysは、成功/失敗に関わらず実行される
+		    	$("#span6").text("complete");
+	        });
+        });
+    </script>
     <title>Title</title>
 </head>
 <body>
     <form method="post" action="post">
         <!--/* TODO: テーブル生成について考える */-->
+        <a class="calendar-next-month" href="" uk-slidenav-next></a>
+        <a class="calendar-prev-month" href="" uk-slidenav-previous></a>
         <table class="uk-table">
             <caption>勤怠を入力したい日付を選択してください。</caption>
             <thead>
