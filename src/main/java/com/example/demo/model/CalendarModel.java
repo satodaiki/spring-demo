@@ -22,7 +22,6 @@ public class CalendarModel {
                 dayOfWeekList.add("Fri");
                 dayOfWeekList.add("Sut");
         }
-
         return dayOfWeekList;
     }
 }
