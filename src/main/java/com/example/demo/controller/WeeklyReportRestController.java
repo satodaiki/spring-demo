@@ -1,5 +1,7 @@
 package com.example.demo.controller;
 
+import com.example.demo.beans.CalendarBeans;
+import com.example.demo.model.CalendarModel;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,7 +40,14 @@ public class WeeklyReportRestController {
         int prevMonth = currentCal.get(Calendar.MONTH) == 1 ? 12 : currentCal.get(Calendar.MONTH);
 
         for (int i = 1; i <= currentCal.getActualMaximum(Calendar.DATE); i++) {
-            currentCalendarMap.put(i, "");
+            CalendarBeans calendarBeans = new CalendarBeans();
+
+            currentCal.set(Calendar.DAY_OF_MONTH, i);
+
+            calendarBeans.setDayOfWeek(currentCal.get(Calendar.DAY_OF_WEEK));
+            calendarBeans.setDayOfWeekStr(CalendarModel.getDayOfWeekStrJP(currentCal.get(Calendar.DAY_OF_WEEK)));
+
+            currentCalendarMap.put(i, calendarBeans);
         }
 
         Calendar nextCal = Calendar.getInstance();
@@ -46,7 +55,14 @@ public class WeeklyReportRestController {
         nextCal.set(Calendar.MONTH, nextMonth);
 
         for (int i = 1; i <= nextCal.getActualMaximum(Calendar.DATE); i++) {
-            nextCalendarMap.put(i, "");
+            CalendarBeans calendarBeans = new CalendarBeans();
+
+            nextCal.set(Calendar.DAY_OF_MONTH, i);
+
+            calendarBeans.setDayOfWeek(nextCal.get(Calendar.DAY_OF_WEEK));
+            calendarBeans.setDayOfWeekStr(CalendarModel.getDayOfWeekStrJP(nextCal.get(Calendar.DAY_OF_WEEK)));
+
+            nextCalendarMap.put(i, calendarBeans);
         }
 
         Calendar prevCal = Calendar.getInstance();
@@ -54,7 +70,14 @@ public class WeeklyReportRestController {
         prevCal.set(Calendar.MONTH, prevMonth);
 
         for (int i = 1; i <= prevCal.getActualMaximum(Calendar.DATE); i++) {
-            prevCalendarMap.put(i, "");
+            CalendarBeans calendarBeans = new CalendarBeans();
+
+            prevCal.set(Calendar.DAY_OF_MONTH, i);
+
+            calendarBeans.setDayOfWeek(prevCal.get(Calendar.DAY_OF_WEEK));
+            calendarBeans.setDayOfWeekStr(CalendarModel.getDayOfWeekStrJP(prevCal.get(Calendar.DAY_OF_WEEK)));
+
+            prevCalendarMap.put(i, calendarBeans);
         }
 
         calendarMap.put("currentCal", currentCalendarMap);
