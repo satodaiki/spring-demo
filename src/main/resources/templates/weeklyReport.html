@@ -8,27 +8,36 @@
     <script th:src="@{/js/uikit-icons.min.js}"></script>
     <!--/* jQuery */-->
     <script th:src="@{/js/jquery-3.3.1.min.js}"></script>
-    <script>
 
+    <!--/* vue.js */-->
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+    <script>
         $(document).ready(function() {
             $.getJSON(
                 "http://localhost:8080/webapi/weeklyReport/getCurrentMonth",
                 function(calendar) {
-                    // 月の初日の曜日を取得
-                    calendar.currentCal["1"].dayOfWeek
+                    // 最終日を取得
+                    var lastDay = Object.keys(calendar.currentCal).length;
 
                     var weekCnt = 0;
 
                     $.each(calendar.currentCal, function(k, v) {
-                        if (v.dayOfWeek == "1") {
+                        // 初日か週初めの場合に週の行を追加
+                        if (v.dayOfWeek == "1" || k == "1") {
+                            $(".day-of-month").append('<tr class="week week-' + weekCnt + '"></tr>');
+                            if (k == "1" || parseInt(v.dayOfWeek, 10) > 1) {
+                                for (var i = 1; i < parseInt(v.dayOfWeek, 10); i++ ) {
+                                    // ここに前月の日入れられそう
+                                    $(".day-of-month .week-" + weekCnt).append('<td class="day uk-text-center"></td>');
+                                }
+                            }
+                        }
+                        $(".day-of-month .week-" + weekCnt).append('<td class="day uk-text-center">' + k + '</td>');
+                        if (v.dayOfWeek == "7") {
                             weekCnt++;
                         }
                     });
-
-                    // 週の要素を追加
-                    for (var i = 0; i < weekCnt; i++) {
-                        $(".day-of-month").append('<tr class="week-' + i + '"></tr>');
-                    }
                 }
             );
         });
