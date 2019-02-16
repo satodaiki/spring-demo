@@ -21,12 +21,6 @@ public class WeeklyReportController {
         // 現在日付の作成
         List<String> dayOfWeekList = CalendarModel.getDayOfWeek(CalendarModel.START_MONDAY);
 
-        // RESTControllerインスタンスの生成
-        WeeklyReportRestController weeklyReportRestController = new WeeklyReportRestController();
-
-        // 現在月のJSONを取得
-        weeklyReportRestController.getCurrentMonth();
-
         model.addAttribute("dayOfWeekList", dayOfWeekList);
         return "weeklyReport";
     }

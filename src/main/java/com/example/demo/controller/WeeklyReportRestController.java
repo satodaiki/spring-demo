@@ -27,59 +27,18 @@ public class WeeklyReportRestController {
         // カレンダー情報
         Map<String, Object> calendarMap = new LinkedHashMap<>();
 
-        Map<Integer, Object> currentCalendarMap = new LinkedHashMap<>();
-
-        Map<Integer, Object> nextCalendarMap = new LinkedHashMap<>();
-
-        Map<Integer, Object> prevCalendarMap = new LinkedHashMap<>();
-
         Calendar currentCal = Calendar.getInstance();
 
-        int nextYear = currentCal.get(Calendar.MONTH) == 12 ? currentCal.get(Calendar.YEAR) + 1 : currentCal.get(Calendar.YEAR);
-        int nextMonth = currentCal.get(Calendar.MONTH) == 12 ? 1 : currentCal.get(Calendar.MONTH);
-        int prevYear = currentCal.get(Calendar.MONTH) == 1 ? currentCal.get(Calendar.YEAR) - 1 : currentCal.get(Calendar.YEAR);
-        int prevMonth = currentCal.get(Calendar.MONTH) == 1 ? 12 : currentCal.get(Calendar.MONTH);
+        int nextYear = currentCal.get(Calendar.MONTH) == 11 ? currentCal.get(Calendar.YEAR) + 1 : currentCal.get(Calendar.YEAR);
+        int nextMonth = currentCal.get(Calendar.MONTH) == 11 ? 0 : currentCal.get(Calendar.MONTH);
+        int prevYear = currentCal.get(Calendar.MONTH) == 0 ? currentCal.get(Calendar.YEAR) - 1 : currentCal.get(Calendar.YEAR);
+        int prevMonth = currentCal.get(Calendar.MONTH) == 0 ? 11 : currentCal.get(Calendar.MONTH);
 
-        for (int i = 1; i <= currentCal.getActualMaximum(Calendar.DATE); i++) {
-            CalendarBeans calendarBeans = new CalendarBeans();
+        Map<Integer, CalendarBeans> currentCalendarMap = getTargetCalendarMap(currentCal.get(Calendar.YEAR), currentCal.get(Calendar.MONTH));
 
-            currentCal.set(Calendar.DAY_OF_MONTH, i);
+        Map<Integer, CalendarBeans> nextCalendarMap = getTargetCalendarMap(nextYear, nextMonth);
 
-            calendarBeans.setDayOfWeek(currentCal.get(Calendar.DAY_OF_WEEK));
-            calendarBeans.setDayOfWeekStr(CalendarModel.getDayOfWeekStrJP(currentCal.get(Calendar.DAY_OF_WEEK)));
-
-            currentCalendarMap.put(i, calendarBeans);
-        }
-
-        Calendar nextCal = Calendar.getInstance();
-        nextCal.set(Calendar.YEAR, nextYear);
-        nextCal.set(Calendar.MONTH, nextMonth);
-
-        for (int i = 1; i <= nextCal.getActualMaximum(Calendar.DATE); i++) {
-            CalendarBeans calendarBeans = new CalendarBeans();
-
-            nextCal.set(Calendar.DAY_OF_MONTH, i);
-
-            calendarBeans.setDayOfWeek(nextCal.get(Calendar.DAY_OF_WEEK));
-            calendarBeans.setDayOfWeekStr(CalendarModel.getDayOfWeekStrJP(nextCal.get(Calendar.DAY_OF_WEEK)));
-
-            nextCalendarMap.put(i, calendarBeans);
-        }
-
-        Calendar prevCal = Calendar.getInstance();
-        prevCal.set(Calendar.YEAR, prevYear);
-        prevCal.set(Calendar.MONTH, prevMonth);
-
-        for (int i = 1; i <= prevCal.getActualMaximum(Calendar.DATE); i++) {
-            CalendarBeans calendarBeans = new CalendarBeans();
-
-            prevCal.set(Calendar.DAY_OF_MONTH, i);
-
-            calendarBeans.setDayOfWeek(prevCal.get(Calendar.DAY_OF_WEEK));
-            calendarBeans.setDayOfWeekStr(CalendarModel.getDayOfWeekStrJP(prevCal.get(Calendar.DAY_OF_WEEK)));
-
-            prevCalendarMap.put(i, calendarBeans);
-        }
+        Map<Integer, CalendarBeans> prevCalendarMap = getTargetCalendarMap(prevYear, prevMonth);
 
         calendarMap.put("currentCal", currentCalendarMap);
         calendarMap.put("nextCal", nextCalendarMap);
@@ -95,64 +54,26 @@ public class WeeklyReportRestController {
     }
 
     @RequestMapping(value = "getTargetMonth/{year}/{month}",produces = "application/json;charset=UTF-8")
-    public String getTargetMonth(@PathVariable("year") String year) {
+    public String getTargetMonth(@PathVariable("year") String year, @PathVariable("month") String month) {
 
         // カレンダー情報
         Map<String, Object> calendarMap = new LinkedHashMap<>();
 
-        Map<Integer, Object> currentCalendarMap = new LinkedHashMap<>();
-
-        Map<Integer, Object> nextCalendarMap = new LinkedHashMap<>();
-
-        Map<Integer, Object> prevCalendarMap = new LinkedHashMap<>();
-
         Calendar currentCal = Calendar.getInstance();
 
-        int nextYear = currentCal.get(Calendar.MONTH) == 12 ? currentCal.get(Calendar.YEAR) + 1 : currentCal.get(Calendar.YEAR);
-        int nextMonth = currentCal.get(Calendar.MONTH) == 12 ? 1 : currentCal.get(Calendar.MONTH);
-        int prevYear = currentCal.get(Calendar.MONTH) == 1 ? currentCal.get(Calendar.YEAR) - 1 : currentCal.get(Calendar.YEAR);
-        int prevMonth = currentCal.get(Calendar.MONTH) == 1 ? 12 : currentCal.get(Calendar.MONTH);
+        // カレンダーの設定（月のみ[0 - 11]で値を取るので注意）
+        currentCal.set(Integer.valueOf(year), Integer.valueOf(month) - 1, 1);
 
-        for (int i = 1; i <= currentCal.getActualMaximum(Calendar.DATE); i++) {
-            CalendarBeans calendarBeans = new CalendarBeans();
+        int nextYear = currentCal.get(Calendar.MONTH) == 11 ? currentCal.get(Calendar.YEAR) + 1 : currentCal.get(Calendar.YEAR);
+        int nextMonth = currentCal.get(Calendar.MONTH) == 11 ? 0 : currentCal.get(Calendar.MONTH) + 1;
+        int prevYear = currentCal.get(Calendar.MONTH) == 0 ? currentCal.get(Calendar.YEAR) - 1 : currentCal.get(Calendar.YEAR);
+        int prevMonth = currentCal.get(Calendar.MONTH) == 0 ? 11 : currentCal.get(Calendar.MONTH) - 1;
 
-            currentCal.set(Calendar.DAY_OF_MONTH, i);
+        Map<Integer, CalendarBeans> currentCalendarMap = getTargetCalendarMap(currentCal.get(Calendar.YEAR), currentCal.get(Calendar.MONTH));
 
-            calendarBeans.setDayOfWeek(currentCal.get(Calendar.DAY_OF_WEEK));
-            calendarBeans.setDayOfWeekStr(CalendarModel.getDayOfWeekStrJP(currentCal.get(Calendar.DAY_OF_WEEK)));
+        Map<Integer, CalendarBeans> nextCalendarMap = getTargetCalendarMap(nextYear, nextMonth);
 
-            currentCalendarMap.put(i, calendarBeans);
-        }
-
-        Calendar nextCal = Calendar.getInstance();
-        nextCal.set(Calendar.YEAR, nextYear);
-        nextCal.set(Calendar.MONTH, nextMonth);
-
-        for (int i = 1; i <= nextCal.getActualMaximum(Calendar.DATE); i++) {
-            CalendarBeans calendarBeans = new CalendarBeans();
-
-            nextCal.set(Calendar.DAY_OF_MONTH, i);
-
-            calendarBeans.setDayOfWeek(nextCal.get(Calendar.DAY_OF_WEEK));
-            calendarBeans.setDayOfWeekStr(CalendarModel.getDayOfWeekStrJP(nextCal.get(Calendar.DAY_OF_WEEK)));
-
-            nextCalendarMap.put(i, calendarBeans);
-        }
-
-        Calendar prevCal = Calendar.getInstance();
-        prevCal.set(Calendar.YEAR, prevYear);
-        prevCal.set(Calendar.MONTH, prevMonth);
-
-        for (int i = 1; i <= prevCal.getActualMaximum(Calendar.DATE); i++) {
-            CalendarBeans calendarBeans = new CalendarBeans();
-
-            prevCal.set(Calendar.DAY_OF_MONTH, i);
-
-            calendarBeans.setDayOfWeek(prevCal.get(Calendar.DAY_OF_WEEK));
-            calendarBeans.setDayOfWeekStr(CalendarModel.getDayOfWeekStrJP(prevCal.get(Calendar.DAY_OF_WEEK)));
-
-            prevCalendarMap.put(i, calendarBeans);
-        }
+        Map<Integer, CalendarBeans> prevCalendarMap = getTargetCalendarMap(prevYear, prevMonth);
 
         calendarMap.put("currentCal", currentCalendarMap);
         calendarMap.put("nextCal", nextCalendarMap);
@@ -165,5 +86,35 @@ public class WeeklyReportRestController {
         }
 
         return "";
+    }
+
+    /**
+     * 対象月のカレンダーマップを取得
+     *
+     * @param targetYear    対象の年
+     * @param targetMonth   対象の月
+     * @return  Map<Integer, CalendarBeans> カレンダーマップオブジェクト
+     */
+    private Map<Integer, CalendarBeans> getTargetCalendarMap(int targetYear, int targetMonth) {
+
+        Map<Integer, CalendarBeans> targetCalendarMap = new LinkedHashMap<>();
+
+        Calendar targetCal = Calendar.getInstance();
+
+        targetCal.clear();
+        targetCal.set(targetYear, targetMonth, 1);
+
+        for (int i = 1; i <= targetCal.getActualMaximum(Calendar.DATE); i++) {
+            CalendarBeans calendarBeans = new CalendarBeans();
+
+            targetCal.set(Calendar.DAY_OF_MONTH, i);
+
+            calendarBeans.setDayOfWeek(targetCal.get(Calendar.DAY_OF_WEEK));
+            calendarBeans.setDayOfWeekStr(CalendarModel.getDayOfWeekStrJP(targetCal.get(Calendar.DAY_OF_WEEK)));
+
+            targetCalendarMap.put(i, calendarBeans);
+        }
+
+        return targetCalendarMap;
     }
 }

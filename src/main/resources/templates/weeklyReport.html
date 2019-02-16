@@ -13,10 +13,68 @@
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 
     <script>
+        var currentYear;
+        var currentMonth;
+
         $(document).ready(function() {
+            let today = new Date();
+
+            // 現在の年を設定
+            currentYear = today.getFullYear();
+
+            // 現在の月を設定（getMonth()は数値を[0 - 11]で取るため注意）
+            currentMonth = today.getMonth() + 1;
+
+            getTargetMonth(currentYear, currentMonth);
+
+            updateCurrentYearMonth();
+
+            /**
+             * 次月表示
+             */
+            $('#nextMonth').on('click', function() {
+
+                currentYear = currentMonth == 12 ? currentYear + 1 : currentYear;
+                currentMonth = currentMonth == 12 ? 1 : currentMonth + 1;
+
+                getTargetMonth(currentYear, currentMonth);
+
+                updateCurrentYearMonth();
+            });
+
+            /**
+             * 前月表示
+             */
+            $('#prevMonth').on('click', function() {
+
+                currentYear = currentMonth == 1 ? currentYear - 1 : currentYear;
+                currentMonth = currentMonth == 1 ? 12 : currentMonth - 1;
+
+                getTargetMonth(currentYear, currentMonth);
+
+                updateCurrentYearMonth();
+            });
+        });
+
+        /**
+         * 要素#currentYearMonthの書き換えを行う
+         */
+        function updateCurrentYearMonth() {
+            $('#currentYearMonth').empty();
+            $('#currentYearMonth').append(currentYear + ' ' + currentMonth);
+        }
+
+        /**
+         * 対象年月のカレンダーを反映
+         */
+        function getTargetMonth(year, month) {
             $.getJSON(
-                "http://localhost:8080/webapi/weeklyReport/getCurrentMonth",
+                "http://localhost:8080/webapi/weeklyReport/getTargetMonth/" + year + "/" + month,
                 function(calendar) {
+
+                    // .day-of-month内の要素をすべて削除
+                    $(".day-of-month").empty();
+
                     // 最終日を取得
                     var lastDay = Object.keys(calendar.currentCal).length;
 
@@ -29,68 +87,40 @@
                             if (k == "1" || parseInt(v.dayOfWeek, 10) > 1) {
                                 for (var i = 1; i < parseInt(v.dayOfWeek, 10); i++ ) {
                                     // ここに前月の日入れられそう
-                                    $(".day-of-month .week-" + weekCnt).append('<td class="day uk-text-center"></td>');
+                                    $(".day-of-month .week-" + weekCnt).append('<td class="day uk-text-top uk-text-left"></td>');
                                 }
                             }
                         }
-                        $(".day-of-month .week-" + weekCnt).append('<td class="day uk-text-center">' + k + '</td>');
+                        $(".day-of-month .week-" + weekCnt).append('<td class="day uk-text-top uk-text-left">' + k + '</td>');
                         if (v.dayOfWeek == "7") {
                             weekCnt++;
                         }
                     });
                 }
             );
-
-            /**
-             * 次月表示
-             */
-            $('nextMonth').on('click', function() {
-                $.getJSON(
-                    "http://localhost:8080/webapi/weeklyReport/getCurrentMonth",
-                    function(calendar) {
-                        // 最終日を取得
-                        var lastDay = Object.keys(calendar.currentCal).length;
-
-                        var weekCnt = 0;
-
-                        $.each(calendar.currentCal, function(k, v) {
-                            // 初日か週初めの場合に週の行を追加
-                            if (v.dayOfWeek == "1" || k == "1") {
-                                $(".day-of-month").append('<tr class="week week-' + weekCnt + '"></tr>');
-                                if (k == "1" || parseInt(v.dayOfWeek, 10) > 1) {
-                                    for (var i = 1; i < parseInt(v.dayOfWeek, 10); i++ ) {
-                                        // ここに前月の日入れられそう
-                                        $(".day-of-month .week-" + weekCnt).append('<td class="day uk-text-center"></td>');
-                                    }
-                                }
-                            }
-                            $(".day-of-month .week-" + weekCnt).append('<td class="day uk-text-center">' + k + '</td>');
-                            if (v.dayOfWeek == "7") {
-                                weekCnt++;
-                            }
-                        });
-                    }
-                );
-            });
-        });
+        }
     </script>
     <title>Title</title>
 </head>
 <body>
     <form method="post" action="post">
+        <h1 id="currentYearMonth" class="uk-heading-divider"></h1>
         <!--/* TODO: テーブル生成について考える */-->
-        <a id="prevMonth" class="calendar-prev-month" uk-slidenav-previous></a>
-        <a id="nextMonth" class="calendar-next-month" uk-slidenav-next></a>
-        <table class="uk-table">
-            <caption>勤怠を入力したい日付を選択してください。</caption>
-            <thead>
-            <tr>
-                <th class="uk-text-center" th:each="dayOfWeek : ${dayOfWeekList}">[[${dayOfWeek}]]</th>
-            </tr>
-            </thead>
-            <tbody class="day-of-month">
-            </tbody>
-        </table>
+        <div class="uk-container">
+            <a id="prevMonth" class="calendar-prev-month" uk-slidenav-previous></a>
+            <a id="nextMonth" class="calendar-next-month" uk-slidenav-next></a>
+
+            <table class="uk-table">
+                <caption>勤怠を入力したい日付を選択してください。</caption>
+                <thead>
+                <tr>
+                    <th class="uk-text-center" th:each="dayOfWeek : ${dayOfWeekList}">[[${dayOfWeek}]]</th>
+                </tr>
+                </thead>
+                <tbody class="day-of-month">
+                </tbody>
+            </table>
+        </div>
     </form>
 </body>
 </html>
