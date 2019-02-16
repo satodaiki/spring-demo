@@ -40,6 +40,38 @@
                     });
                 }
             );
+
+            /**
+             * 次月表示
+             */
+            $('nextMonth').on('click', function() {
+                $.getJSON(
+                    "http://localhost:8080/webapi/weeklyReport/getCurrentMonth",
+                    function(calendar) {
+                        // 最終日を取得
+                        var lastDay = Object.keys(calendar.currentCal).length;
+
+                        var weekCnt = 0;
+
+                        $.each(calendar.currentCal, function(k, v) {
+                            // 初日か週初めの場合に週の行を追加
+                            if (v.dayOfWeek == "1" || k == "1") {
+                                $(".day-of-month").append('<tr class="week week-' + weekCnt + '"></tr>');
+                                if (k == "1" || parseInt(v.dayOfWeek, 10) > 1) {
+                                    for (var i = 1; i < parseInt(v.dayOfWeek, 10); i++ ) {
+                                        // ここに前月の日入れられそう
+                                        $(".day-of-month .week-" + weekCnt).append('<td class="day uk-text-center"></td>');
+                                    }
+                                }
+                            }
+                            $(".day-of-month .week-" + weekCnt).append('<td class="day uk-text-center">' + k + '</td>');
+                            if (v.dayOfWeek == "7") {
+                                weekCnt++;
+                            }
+                        });
+                    }
+                );
+            });
         });
     </script>
     <title>Title</title>
@@ -47,8 +79,8 @@
 <body>
     <form method="post" action="post">
         <!--/* TODO: テーブル生成について考える */-->
-        <a class="calendar-prev-month" href="" uk-slidenav-previous></a>
-        <a class="calendar-next-month" href="" uk-slidenav-next></a>
+        <a id="prevMonth" class="calendar-prev-month" uk-slidenav-previous></a>
+        <a id="nextMonth" class="calendar-next-month" uk-slidenav-next></a>
         <table class="uk-table">
             <caption>勤怠を入力したい日付を選択してください。</caption>
             <thead>
@@ -59,9 +91,6 @@
             <tbody class="day-of-month">
             </tbody>
         </table>
-        <input type="text" name="test" />
-        <input type="submit" value="送信" />
     </form>
-    <p>[[${text}]]</p>
 </body>
 </html>
