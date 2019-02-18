@@ -11,7 +11,7 @@
     <script th:src="@{/js/jquery-3.3.1.min.js}"></script>
 
     <!--/* vue.js */-->
-    <script src="@{/js/vue-2.6.6.min.js}"></script>
+    <script th:src="@{/js/vue-2.6.6.min.js}"></script>
 
     <script>
         var currentYear;
@@ -25,8 +25,6 @@
 
             // 現在の月を設定（getMonth()は数値を[0 - 11]で取るため注意）
             currentMonth = today.getMonth() + 1;
-
-            getTargetMonth(currentYear, currentMonth);
 
             updateCurrentYearMonth();
 
@@ -55,6 +53,7 @@
 
                 updateCurrentYearMonth();
             });
+
         });
 
         /**
@@ -68,6 +67,7 @@
         /**
          * 対象年月のカレンダーを反映
          */
+        /*
         function getTargetMonth(year, month) {
             $.getJSON(
                 "http://localhost:8080/webapi/weeklyReport/getTargetMonth/" + year + "/" + month,
@@ -100,6 +100,28 @@
                 }
             );
         }
+        */
+
+        /**
+         * カレンダーを作成
+         */
+        var weekTable = new Vue({
+            el: '#calendarBody',
+            data: {
+                currentCalendar: {},
+                nextCalendar: {},
+                prevCalendar: {}
+            },
+            created() {
+                fetch("http://localhost:8080/webapi/weeklyReport/getTargetMonth/2019/1")
+                    .then(response => response.json())
+                    .then(json => {
+                        this.currentCal = json.currentCal;
+                        this.nextCale = json.nextCal;
+                        this.prevCal = json.prevCal;
+                    });
+            }
+        });
     </script>
     <title>Title</title>
 </head>
@@ -118,7 +140,10 @@
                     <th class="uk-text-center" th:each="dayOfWeek : ${dayOfWeekList}">[[${dayOfWeek}]]</th>
                 </tr>
                 </thead>
-                <tbody class="day-of-month">
+                <tbody id="calendarBody" class="day-of-month">
+                    <tr v-for="calendar in currentCalendar">
+                        <td v-if="calendar.dayOfWeek"></td>
+                    </tr>
                 </tbody>
             </table>
         </div>
